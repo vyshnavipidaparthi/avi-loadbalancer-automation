@@ -1,0 +1,9 @@
+api:
+  base_url: "https://avi-mock-api-production.up.railway.app"
+  username: "Test"
+  password: "password"
+  target_vs_name: "backend-vs-t1r_1000-1"
+
+tests:
+  parallel: true
+  num_threads: 2
