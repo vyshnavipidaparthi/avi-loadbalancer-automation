@@ -1,5 +1,11 @@
 pipeline {
-    agent any
+    agent {
+        docker {
+            // Use a Python 3.13 image so Jenkins runs the same version as your local setup
+            image 'python:3.13'
+            args '-u root'
+        }
+    }
 
     stages {
         stage('Checkout') {
@@ -11,10 +17,8 @@ pipeline {
 
         stage('Setup Python Environment') {
             steps {
-                echo " Installing Python and setting up virtual environment..."
+                echo " Setting up virtual environment and installing dependencies..."
                 sh '''
-                apt-get update
-                apt-get install -y python3 python3-venv python3-pip
                 python3 -m venv venv
                 . venv/bin/activate
                 pip install --upgrade pip
@@ -33,7 +37,7 @@ pipeline {
                 sh '''
                 . venv/bin/activate
                 if [ -f main.py ]; then
-                    python main.py || echo " main.py failed or returned error"
+                    python main.py
                 else
                     echo " main.py not found in repository."
                 fi
