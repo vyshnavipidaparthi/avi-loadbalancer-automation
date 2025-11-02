@@ -11,12 +11,18 @@ pipeline {
 
         stage('Setup Python Environment') {
             steps {
-                echo " Setting up Python environment..."
+                echo " Installing Python and setting up virtual environment..."
                 sh '''
+                apt-get update
+                apt-get install -y python3 python3-venv python3-pip
                 python3 -m venv venv
-                source venv/bin/activate
+                . venv/bin/activate
                 pip install --upgrade pip
-                pip install -r requirements.txt || true
+                if [ -f requirements.txt ]; then
+                    pip install -r requirements.txt
+                else
+                    echo " No requirements.txt found, skipping dependency installation."
+                fi
                 '''
             }
         }
@@ -25,8 +31,12 @@ pipeline {
             steps {
                 echo " Running main Python automation script..."
                 sh '''
-                source venv/bin/activate
-                python main.py || echo " main.py not found or failed"
+                . venv/bin/activate
+                if [ -f main.py ]; then
+                    python main.py || echo " main.py failed or returned error"
+                else
+                    echo " main.py not found in repository."
+                fi
                 '''
             }
         }
